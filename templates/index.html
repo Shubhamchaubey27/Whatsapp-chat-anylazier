@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Analyzer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="analyzer-container">
+        <div class="whatsapp-icon">
+            <i class="fab fa-whatsapp"></i>
+        </div>
+
+        <h1>WhatsApp Chat Analyzer</h1>
+        <p class="subtitle">Transform your chat history into meaningful insights with our advanced analytics engine</p>
+
+        <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-container" id="fileContainer">
+                <input type="file" class="file-input" name="file" accept=".txt" required id="fileInput">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">Drop your chat file here</div>
+                <div class="upload-subtext">or click to browse • .txt files only</div>
+            </div>
+
+            <button type="submit" class="analyze-btn">
+                <i class="fas fa-chart-line" style="margin-right: 8px;"></i>
+                Analyze My Chat
+            </button>
+        </form>
+
+        <div class="features">
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="feature-title">Statistics</div>
+                    <div class="feature-desc">Message counts & trends</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="feature-title">Timeline</div>
+                    <div class="feature-desc">Activity patterns</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="feature-title">Sentiment</div>
+                    <div class="feature-desc">Mood analysis</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-title">Privacy</div>
+                    <div class="feature-desc">Secure processing</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileContainer = document.getElementById('fileContainer');
+        const fileInput = document.getElementById('fileInput');
+
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileContainer.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileContainer.addEventListener(eventName, () => {
+                fileContainer.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileContainer.addEventListener(eventName, () => {
+                fileContainer.classList.remove('dragover');
+            }, false);
+        });
+
+        fileContainer.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updateFileName(files[0].name);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                updateFileName(e.target.files[0].name);
+            }
+        });
+
+        function updateFileName(fileName) {
+            const uploadText = fileContainer.querySelector('.upload-text');
+            const uploadSubtext = fileContainer.querySelector('.upload-subtext');
+            uploadText.textContent = fileName;
+            uploadSubtext.textContent = 'File selected • Ready to analyze';
+            fileContainer.style.borderColor = '#25D366';
+            fileContainer.style.background = '#f0fff4';
+        }
+
+        // Add subtle parallax effect to background
+        document.addEventListener('mousemove', (e) => {
+            const container = document.querySelector('.analyzer-container');
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+
+            container.style.transform = `perspective(1000px) rotateX(${(y - 50) * 0.1}deg) rotateY(${(x - 50) * 0.1}deg)`;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            const container = document.querySelector('.analyzer-container');
+            container.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Analyzer - Upload</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='upload.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header animate-fade-in">
+            <h1>
+                <i class="fab fa-whatsapp whatsapp-icon"></i>
+                WhatsApp Chat Analyzer
+            </h1>
+            <p class="subtitle">Discover meaningful insights from your WhatsApp conversations with our advanced analytics.</p>
+        </header>
+
+        <!-- Upload Section -->
+        <section class="upload-section animate-fade-in">
+            <div class="upload-box">
+                <h2>Upload Your Chat</h2>
+                <p>Upload your WhatsApp chat export (.txt or .zip file) to explore detailed analytics.</p>
+                <form method="post" enctype="multipart/form-data">
+                    <label for="file" class="custom-file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Choose a .txt or .zip file
+                    </label>
+                    <input type="file" id="file" name="file" accept=".txt,.zip" required>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i>
+                        Analyze Chat
+                    </button>
+                </form>
+                <p class="upload-note"><strong>Note:</strong> File size limit is 100MB. Large files may take a moment to process.</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </section>
+
+        <!-- How to Export WhatsApp Chat -->
+        <section class="export-guide animate-fade-in">
+            <h2>How to Export WhatsApp Chat</h2>
+            <div class="export-steps">
+                <h3>For Android:</h3>
+                <ul>
+                    <li>Open WhatsApp and go to the chat you want to export.</li>
+                    <li>Tap the three-dot menu (⋮) in the top-right corner.</li>
+                    <li>Select <strong>More > Export Chat</strong>.</li>
+                    <li>Choose <strong>Without Media</strong> for a .txt file or <strong>With Media</strong> for a .zip file.</li>
+                    <li>Save the file to your device or share it (e.g., via email or file manager).</li>
+                </ul>
+                <h3>For iOS:</h3>
+                <ul>
+                    <li>Open WhatsApp and navigate to the desired chat.</li>
+                    <li>Tap the contact or group name at the top.</li>
+                    <li>Scroll down and select <strong>Export Chat</strong>.</li>
+                    <li>Choose <strong>Without Media</strong> or <strong>With Media</strong>.</li>
+                    <li>Save the file to your Files app or share it (e.g., via AirDrop or email).</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section animate-fade-in">
+            <h2>Our Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Message Analytics</h3>
+                    <p>Visualize message frequency, busiest days, and conversation patterns over time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h3>Word Cloud</h3>
+                    <p>Discover the most frequently used words with an interactive word cloud.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <h3>Emoji Insights</h3>
+                    <p>Analyze emoji usage to understand sentiment and user preferences.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>User Activity</h3>
+                    <p>Identify top participants, conversation starters, and response times.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h3>Link Tracking</h3>
+                    <p>Track and analyze shared links for deeper insights into shared content.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h3>PDF Reports</h3>
+                    <p>Download detailed analysis reports in PDF format for easy sharing.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy Note -->
+        <section class="privacy-note animate-fade-in">
+            <h2>Privacy First</h2>
+            <p>Your data is processed locally on your device, and we do not store or transmit any of your chat data. Your privacy is our priority.</p>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Copyright 2025 © Chat Analyzer. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('file');
+            const label = document.querySelector('.custom-file-upload');
+            input.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    label.innerHTML = `<i class="fas fa-file"></i> ${this.files[0].name}`;
+                }
+            });
+
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function() {
+                const button = form.querySelector('button');
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            });
+
+            // Fade-in animation on scroll
+            const elements = document.querySelectorAll('.animate-fade-in');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            elements.forEach(element => observer.observe(element));
+        });
+    </script>
+</body>
+</html>

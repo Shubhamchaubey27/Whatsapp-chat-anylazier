@@ -1,0 +1,351 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f7f9fc; /* Soft light blue-gray background */
+    color: #2d3748; /* Dark gray for text */
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.animate-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+}
+
+.header h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #1a3c6d; /* Deep blue for title */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.whatsapp-icon {
+    color: #25D366; /* WhatsApp green */
+    font-size: 3rem;
+    transition: transform 0.3s ease;
+}
+
+.header h1:hover .whatsapp-icon {
+    transform: scale(1.1);
+}
+
+.subtitle {
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #4a5568;
+    margin-top: 0.6rem;
+    background: linear-gradient(90deg, #007BFF, #00C4FF); /* Gradient blue */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Upload Section */
+.upload-section {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    padding: 2.5rem;
+    margin-bottom: 3.5rem;
+    text-align: center;
+}
+
+.upload-section h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a3c6d;
+    margin-bottom: 1rem;
+}
+
+.upload-section p {
+    font-size: 1.1rem;
+    color: #718096;
+    margin-bottom: 1.8rem;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 1.2rem 2.5rem;
+    background: linear-gradient(135deg, #007BFF, #00C4FF);
+    color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    margin-bottom: 1.2rem;
+}
+
+.custom-file-upload:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    background: linear-gradient(135deg, #005BB5, #0096CC);
+}
+
+.custom-file-upload i {
+    margin-right: 0.6rem;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007BFF, #00C4FF);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #005BB5, #0096CC);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+}
+
+.btn-primary i {
+    margin-right: 0.6rem;
+}
+
+.upload-note {
+    font-size: 0.95rem;
+    color: #718096;
+    margin-top: 1.2rem;
+}
+
+/* Flash Messages */
+.flash-messages {
+    margin: 1.2rem 0;
+}
+
+.flash {
+    padding: 1.2rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.flash.error {
+    background-color: #fef0f0;
+    color: #9b2c2c;
+    border: 1px solid #feb2b2;
+}
+
+.flash.success {
+    background-color: #e6fffa;
+    color: #2c7a7b;
+    border: 1px solid #b2f5ea;
+}
+
+/* Export Guide */
+.export-guide {
+    margin-bottom: 3.5rem;
+}
+
+.export-guide h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a3c6d;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.export-steps {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+}
+
+.export-steps h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #007BFF;
+    margin-bottom: 1rem;
+}
+
+.export-steps ul {
+    list-style-type: disc;
+    margin-left: 2rem;
+    font-size: 1rem;
+    color: #2d3748;
+}
+
+.export-steps li {
+    margin-bottom: 0.6rem;
+}
+
+/* Features Section */
+.features-section {
+    margin-bottom: 3.5rem;
+}
+
+.features-section h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a3c6d;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns for desktop */
+    gap: 1.5rem;
+}
+
+.feature-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(0, 123, 255, 0.2);
+}
+
+.feature-card .card-icon {
+    background: linear-gradient(135deg, #007BFF, #00C4FF);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: #fff;
+    font-size: 1.8rem;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .card-icon {
+    transform: rotate(360deg);
+}
+
+.feature-card h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a3c6d;
+    margin-bottom: 0.6rem;
+}
+
+.feature-card p {
+    font-size: 0.95rem;
+    color: #718096;
+}
+
+/* Privacy Note */
+.privacy-note {
+    text-align: center;
+    margin-bottom: 3.5rem;
+}
+
+.privacy-note h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a3c6d;
+    margin-bottom: 1rem;
+}
+
+.privacy-note p {
+    font-size: 1.1rem;
+    color: #4a5568;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 1.8rem 0;
+    background: linear-gradient(90deg, #007BFF, #00C4FF);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .features-grid {
+        grid-template-columns: 1fr; /* Single column for smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2.2rem;
+    }
+
+    .whatsapp-icon {
+        font-size: 2.5rem;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+    }
+
+    .upload-section h2,
+    .export-guide h2,
+    .features-section h2,
+    .privacy-note h2 {
+        font-size: 1.7rem;
+    }
+
+    .export-steps h3 {
+        font-size: 1.2rem;
+    }
+
+    .feature-card {
+        padding: 1.5rem;
+    }
+
+    .feature-card .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+}

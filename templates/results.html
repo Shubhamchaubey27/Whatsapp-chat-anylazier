@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Analysis - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-background"></div>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Chat Analysis Dashboard</h1>
+                        <p>Comprehensive insights from your WhatsApp conversations</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <a href="{{ url_for('upload_file') }}" class="btn btn-outline">
+                        <i class="fas fa-upload"></i>
+                        Upload New
+                    </a>
+                    <a href="{{ url_for('download_pdf', filename=pdf_file) }}" class="btn btn-primary" id="download-pdf">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash flash-{{ category }}">
+                                <i class="fas fa-info-circle"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- User Selection Control -->
+            <div class="control-section">
+                <form method="post" action="{{ url_for('results') }}" class="user-form">
+                    <div class="form-group">
+                        <label for="userSelect">
+                            <i class="fas fa-user"></i>
+                            Select User
+                        </label>
+                        <div class="select-wrapper">
+                            <select name="user" id="userSelect" class="user-select" onchange="this.form.submit()">
+                                {% for user in users %}
+                                    <option value="{{ user }}" {% if user == selected_user %}selected{% endif %}>
+                                        {{ user }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Overview Statistics -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-chart-bar"></i>
+                        Overview Statistics
+                    </h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ overview_stats.total_messages|default('N/A') }}</div>
+                            <div class="stat-label">Total Messages</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ overview_stats.total_words|default('N/A') }}</div>
+                            <div class="stat-label">Total Words</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ overview_stats.media_shared|default('N/A') }}</div>
+                            <div class="stat-label">Media Shared</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ overview_stats.links_shared|default('N/A') }}</div>
+                            <div class="stat-label">Links Shared</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ overview_stats.unique_conversations|default('N/A') }}</div>
+                            <div class="stat-label">Conversations</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ "%.1f"|format(overview_stats.avg_response_time|default(0)) }}</div>
+                            <div class="stat-label">Avg Response (min)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-chart-line"></i>
+                        Activity Timeline
+                    </h2>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Monthly Message Activity</h3>
+                        <div class="chart-container">
+                            {{ monthly_timeline | safe }}
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Daily Message Activity</h3>
+                        <div class="chart-container">
+                            {{ daily_timeline | safe }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activity Patterns -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-calendar-alt"></i>
+                        Activity Patterns
+                    </h2>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Messages by Day of Month</h3>
+                        <div class="chart-container">
+                            {{ busy_day_plot | safe }}
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Messages by Month</h3>
+                        <div class="chart-container">
+                            {{ busy_month_plot | safe }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Heatmap and Visual Analysis -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-th"></i>
+                        Visual Analysis
+                    </h2>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-card full-width">
+                        <h3>Weekly Activity Heatmap</h3>
+                        <div class="chart-container">
+                            {{ weekly_heatmap | safe }}
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Word Cloud</h3>
+                        <div class="chart-container">
+                            {% if wordcloud %}
+                                <img src="data:image/png;base64,{{ wordcloud }}" alt="Word Cloud" class="wordcloud-img">
+                            {% else %}
+                                <div class="no-data">
+                                    <i class="fas fa-cloud"></i>
+                                    <p>No words available for word cloud</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Word and Emoji Analysis -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-smile"></i>
+                        Text & Emoji Analysis
+                    </h2>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <h3>Most Used Words</h3>
+                        <div class="word-list">
+                            {% for word, count in most_used_words %}
+                                <div class="word-item">
+                                    <span class="word">{{ word }}</span>
+                                    <span class="count">{{ count }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="analysis-card">
+                        <h3>User-Specific Words</h3>
+                        <div class="user-words">
+                            {% for user, words in user_words.items() %}
+                                <div class="user-word-item">
+                                    <div class="user-name">{{ user }}</div>
+                                    <div class="words">{{ words|map(attribute=0)|join(', ') }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Emoji Usage</h3>
+                    <div class="chart-container">
+                        {{ emoji_plot | safe }}
+                    </div>
+                    <div class="emoji-users">
+                        {% for user, emojis in user_emojis.items() %}
+                            <div class="emoji-user">
+                                <span class="user-name">{{ user }}</span>
+                                <span class="emojis">{{ emojis|map(attribute=0)|join(' ') }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Activity Analysis -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-users"></i>
+                        User Activity Analysis
+                    </h2>
+                </div>
+                <div class="users-grid">
+                    {% for user_data in busy_users %}
+                        <div class="user-card">
+                            <div class="user-header">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <h3>{{ user_data.user }}</h3>
+                            </div>
+                            <div class="user-stats">
+                                <div class="user-stat">
+                                    <span class="stat-label">Messages</span>
+                                    <span class="stat-value">{{ user_data.total_messages }}</span>
+                                </div>
+                                <div class="user-stat">
+                                    <span class="stat-label">Words</span>
+                                    <span class="stat-value">{{ user_data.total_words }}</span>
+                                </div>
+                                <div class="user-stat">
+                                    <span class="stat-label">Media</span>
+                                    <span class="stat-value">{{ user_data.media_shared }}</span>
+                                </div>
+                                <div class="user-stat">
+                                    <span class="stat-label">Links</span>
+                                    <span class="stat-value">{{ user_data.links_shared }}</span>
+                                </div>
+                            </div>
+                            <div class="user-emojis">
+                                <span class="emojis-label">Top Emojis:</span>
+                                <span class="emojis">{{ user_data.top_emojis|map(attribute=0)|join(' ') }}</span>
+                            </div>
+                            <div class="chart-container">
+                                {{ user_data.plot | safe }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Advanced Charts -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-chart-area"></i>
+                        Advanced Analytics
+                    </h2>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Activity Pattern Analysis</h3>
+                        <div class="chart-container">
+                            {{ radar_chart | safe }}
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>24-Hour Activity Pattern</h3>
+                        <div class="chart-container">
+                            {{ nightingale_chart | safe }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ranking and Flow Charts -->
+            {% if selected_user == 'All Users' %}
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-trophy"></i>
+                        User Rankings
+                    </h2>
+                </div>
+                <div class="chart-card">
+                    <h3>User Ranking Over Time</h3>
+                    <div class="chart-container">
+                        {{ bump_chart | safe }}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-water"></i>
+                        Message Flow & Distribution
+                    </h2>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Message Flow Over Time</h3>
+                        <div class="chart-container">
+                            {{ stream_graph | safe }}
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>{% if selected_user == 'All Users' %}Message Distribution{% else %}Activity Breakdown{% endif %}</h3>
+                        <div class="chart-container">
+                            {{ pie_chart | safe }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conversation Patterns -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-comments"></i>
+                        Conversation Insights
+                    </h2>
+                </div>
+                <div class="conversation-grid">
+                    <div class="conversation-card">
+                        <h3>Top Conversation Starters</h3>
+                        <div class="conversation-list">
+                            {% for user, count in conversation_patterns.starters.items() %}
+                                <div class="conversation-item">
+                                    <div class="conv-user">{{ user }}</div>
+                                    <div class="conv-count">{{ count }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="conversation-card">
+                        <h3>Top Conversation Closers</h3>
+                        <div class="conversation-list">
+                            {% for user, count in conversation_patterns.closers.items() %}
+                                <div class="conversation-item">
+                                    <div class="conv-user">{{ user }}</div>
+                                    <div class="conv-count">{{ count }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if conversation_patterns.longest_conversations %}
+                    <div class="conversation-card">
+                        <h3>Longest Conversations</h3>
+                        <div class="long-conversations">
+                            {% for conv in conversation_patterns.longest_conversations %}
+                                <div class="long-conv-item">
+                                    <div class="conv-info">
+                                        <div class="conv-stats">
+                                            <span class="messages">{{ conv.length }} messages</span>
+                                            <span class="participants">{{ conv.participants }} participants</span>
+                                        </div>
+                                        <div class="conv-date">Started: {{ conv.start_date }}</div>
+                                    </div>
+                                    <div class="conv-duration">{{ "%.1f"|format(conv.duration_hours) }}h</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- Inactive Periods -->
+            {% if inactive_periods %}
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-pause"></i>
+                        Inactive Periods
+                    </h2>
+                </div>
+                <div class="inactive-card">
+                    <h3>Longest Inactive Periods</h3>
+                    <div class="inactive-list">
+                        {% for period in inactive_periods[:5] %}
+                            <div class="inactive-item">
+                                <div class="inactive-info">
+                                    <div class="inactive-dates">
+                                        <span>{{ period.start_date }}</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                        <span>{{ period.end_date }}</span>
+                                    </div>
+                                </div>
+                                <div class="inactive-duration">{{ "%.1f"|format(period.duration_days) }} days</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Shared Links -->
+            {% if user_links %}
+            <section class="section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-link"></i>
+                        Shared Links - {{ selected_user }}
+                    </h2>
+                </div>
+                <div class="links-grid">
+                    {% for link_data in user_links[:10] %}
+                        <div class="link-card">
+                            <div class="link-header">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div class="link-date">{{ link_data.date }}</div>
+                            </div>
+                            <a href="{{ link_data.link }}" target="_blank" class="link-url">{{ link_data.link }}</a>
+                            <div class="link-message">{{ link_data.message }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 WhatsApp Chat Analysis Dashboard. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.section, .chart-card, .stat-card, .user-card').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Handle user selection
+            const select = document.getElementById('userSelect');
+            select.addEventListener('change', function() {
+                const form = this.closest('form');
+                const wrapper = form.querySelector('.select-wrapper');
+                wrapper.classList.add('loading');
+            });
+
+            // Handle download button
+            const downloadLink = document.getElementById('download-pdf');
+            downloadLink.addEventListener('click', function(e) {
+                this.classList.add('loading');
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+                setTimeout(() => {
+                    this.classList.remove('loading');
+                    this.innerHTML = '<i class="fas fa-download"></i> Download Report';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
